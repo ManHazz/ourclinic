@@ -1,0 +1,43 @@
+# .NET build artifacts
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.cache
+
+# User-specific settings
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Logs & temp files
+logs/
+*.log
+*.tmp
+
+# Secrets (DO NOT COMMIT)
+.env
+appsettings.json
+appsettings.Development.json
+
+# Node dependencies
+node_modules/
+npm-debug.log
+yarn.lock
+package-lock.json
+
+# Build files
+dist/
+build/
+
+# Editor-specific
+.vscode/
+.idea/
+*.swp
+
+# Environment files (DO NOT COMMIT)
+.env
+
