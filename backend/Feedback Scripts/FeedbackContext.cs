@@ -1,25 +1,35 @@
 using OfficeOpenXml;
-using System;
-using System.IO;
+using backend.excel;
 
-public class Feedback
+public class Feedback : ExcelBase
 {
-    public required int Id { get; set; }
-    public required int Mood { get; set; }
-    public required string Description { get; set; }
-    public required string Verification { get; set; }
+    public string Mood { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public string Verification { get; set; } = string.Empty;
 
-    private static readonly string filePath = "./excel/feedback-db.xlsx"; // Encapsulation
+    public Feedback() { }
+
+    public override string GetFilePath()
+    {
+        string relativePath = Path.Combine("..", "backend", "excel", "feedback-db.xlsx");
+        string fullPath = Path.GetFullPath(relativePath);
+        return fullPath;
+    }
+
 
     public static bool SaveToExcel(Feedback feedback, out string errorMessage)
     {
         errorMessage = string.Empty;
 
+        Feedback instance = new Feedback();
+        string filePath = instance.GetFilePath();
+
         try
         {
             if (!File.Exists(filePath))
             {
-                errorMessage = "Excel file not found.";
+                errorMessage = "Excel does not exist";
+                errorMessage = filePath;
                 return false;
             }
 
