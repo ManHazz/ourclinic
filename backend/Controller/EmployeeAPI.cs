@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 [Route("api/employee")]
 public class EmployeeController : ControllerBase
 {
-    [HttpGet("doctor")]
+    [HttpGet("doctors")]
     public ActionResult<IEnumerable<Employee>> GetDoctors()
     {
         var employees = Employee.GetAllEmployees().Where(e => e.Role == "Doctor").ToList();
@@ -16,7 +16,7 @@ public class EmployeeController : ControllerBase
         }
     }
 
-    [HttpGet("nurse")]
+    [HttpGet("nurses")]
     public ActionResult<IEnumerable<Employee>> GetNurses()
     {
         var employees = Employee.GetAllEmployees().Where(e => e.Role == "Nurse").ToList();
@@ -28,7 +28,7 @@ public class EmployeeController : ControllerBase
         }
     }
 
-    [HttpGet("receptionist")]
+    [HttpGet("receptionists")]
     public ActionResult<IEnumerable<Employee>> GetReceptionists()
     {
         var employees = Employee.GetAllEmployees().Where(e => e.Role == "Receptionist").ToList();
