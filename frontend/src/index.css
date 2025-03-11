@@ -1,68 +1,71 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@import "tailwindcss";
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* / Slick-Slider / */
+.slick-slide {
+  padding-inline: 5px !important;
+}
+.slick-list {
+  /* / min-height: 320px !important; / */
+  width: 90vw !important;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+.slick-dots li.slick-active button:before {
+  font-size: 20px !important;
+  display: flex !important;
+  justify-content: center !important;
+  border: none;
+  color: #dda45c !important;
 }
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
+.slick-dots li button:before {
+  font-size: 20px !important;
   display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  justify-content: center !important;
+  border: none;
+  color: white !important;
+  border: 1px solid #dda45c;
+  border-radius: 100%;
+  opacity: 0.75 !important;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+.lawyers .slick-track {
+  margin-bottom: 20px !important;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+.slick-arrow.slick-next:before {
+  content: "";
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+.slick-arrow.slick-prev:before {
+  content: "";
+}
+.description-truncate {
+  display: -webkit-box;
+  -webkit-line-clamp: 6;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+@media only screen and (max-width: 767px) {
+  .slick-list {
+    width: 90vw !important;
   }
-  a:hover {
-    color: #747bff;
+  .slick-prev {
+    left: -15px !important;
   }
-  button {
-    background-color: #f9f9f9;
+  .slick-next {
+    right: -20px !important;
+  }
+}
+@media only screen and (min-width: 1024px) {
+  .slick-prev {
+    left: -40px !important;
+  }
+  .slick-next {
+    right: -40px !important;
+  }
+}
+
+@media only screen and (min-width: 1280px) {
+  .slick-list {
+    max-width: 1230px !important;
   }
 }
