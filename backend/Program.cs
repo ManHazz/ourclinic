@@ -1,39 +1,26 @@
-using System;
-using System.Text;
-using ClosedXML.Excel;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using searchPatient; // Correctly referencing the namespace
+using searchAppointment;
 
 var builder = WebApplication.CreateBuilder(args);
-var app = builder.Build();
 
-app.MapGet("/", () =>
+// Configure services
+builder.Services.AddCors(options =>
 {
-    return DisplayData("./excel/patient.xlsx");
+    options.AddPolicy("AllowAll",
+        policy => policy.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
 });
 
+var app = builder.Build();
+
+// Apply Middleware
+app.UseCors("AllowAll");
+app.UseAuthorization();
+app.MapControllers();
 app.Run();
-
-static string DisplayData(string filepath)
-{
-    StringBuilder output = new StringBuilder();
-    
-    // Open the Excel File
-    using (var workbook = new XLWorkbook(filepath))
-    {
-        var worksheet = workbook.Worksheet(1);
-        var range = worksheet.RangeUsed();
-
-        foreach (var row in range.Rows())
-        {
-            foreach (var cell in row.Cells())
-            {
-                output.Append(cell.Value + "\t");
-            }
-            output.AppendLine();
-        }
-    }
-    
-    return output.ToString();
-}
