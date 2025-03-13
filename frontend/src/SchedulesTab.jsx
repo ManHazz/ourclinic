@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import EmployeeSchedule from "./EmployeeSchedule"; // Component to display schedules
-import SlidingTabBar from "./SlidingBar"; // Animated tab bar
-import Footer from "./Footer";
+import EmployeeSchedule from "./Components/EmployeeSchedule"; // Component to display schedules
+import SlidingTabBar from "./Components/SlidingBar"; // Animated tab bar
+import Footer from "./Components/Footer";
 
 const Navitem = ["Home", "Patients", "Schedules", "Appointments", "Medicines"];
 
@@ -80,8 +80,18 @@ const SchedulesTab = () => {
         </div>
 
         {/* Dynamic Schedule Display */}
-        <div className="relative z-10 w-full max-w-5xl px-5">
-          <EmployeeSchedule category={activeTab} />
+        <div
+          className="relative z-10 backdrop-blur-sm bg-white/40 p-5 rounded-xl shadow-lg max-w-5xl w-full mx-5 overflow-x-auto mb-15"
+          style={{ background: "#edf2f7" }}
+        >
+          <div
+            className="relative z-10 w-full max-w-5xl px-5 mt-5 mb-5"
+            style={{ minHeight: "400px" }}
+          >
+            {" "}
+            {/* Set a min height */}
+            <EmployeeSchedule category={activeTab} />
+          </div>
         </div>
       </div>
 

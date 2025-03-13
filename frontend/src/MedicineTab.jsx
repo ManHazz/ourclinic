@@ -1,10 +1,46 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import MedCard from "./Components/MedCard";
 
 let Navitem = ["Home", "Patients", "Schedules", "Appointments", "Medicines"];
 
+const medicineURL = "http://localhost:5250/api/medicine";
+
 const MedicineTab = () => {
   const [navbar, setNavbar] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(medicineURL);
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        const data = await response.json();
+        setProducts(data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Calculate the current items to display
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = products.slice(indexOfFirstItem, indexOfLastItem);
+
+  // Calculate total pages
+  const totalPages = Math.ceil(products.length / itemsPerPage);
+
+  // Handle page change
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   return (
     <div className="font-poppins flex flex-col justify-center items-center !bg-white">
@@ -37,7 +73,7 @@ const MedicineTab = () => {
             <img src={"/menu.svg"} alt="menu" className="h-[30px]" />
           </div>
 
-          {/* Mobile Navigation (Fixed and Properly Positioned) */}
+          {/* Mobile Navigation */}
           <div
             className={`absolute top-[110px] right-0 w-full bg-white shadow-xl transition-transform duration-500 ease-in-out z-40 ${
               navbar
@@ -51,7 +87,7 @@ const MedicineTab = () => {
                   key={index}
                   to={`/${navitem.toLowerCase()}`}
                   className="text-[#1C1C23] hover:text-[#DDA45C] font-semibold text-lg"
-                  onClick={() => setNavbar(false)} // Close menu on click
+                  onClick={() => setNavbar(false)}
                 >
                   {navitem}
                 </Link>
@@ -61,13 +97,47 @@ const MedicineTab = () => {
         </div>
       </div>
 
-      {/* Popular Lawyer Background Fix */}
+      {/* Content and BG */}
       <div className="relative w-full md:min-h-[761px] min-h-[700px] flex justify-center items-center">
         <img
           src="/popular_lawyer_back.png"
           alt="popular"
           className="absolute top-0 left-0 w-full h-full object-cover"
         />
+        <div className="absolute inset-20">
+          <h2 className="text-xl font-semibold z-1 mb-25">
+            Available Medicines
+          </h2>
+        </div>
+
+        <div className="flex flex-wrap justify-center">
+          {currentItems.map((product, index) => (
+            <MedCard
+              key={index}
+              image={product.image}
+              name={product.name}
+              type={product.type}
+              balance={product.balance}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Pagination Controls */}
+      <div className="flex justify-center mt-4">
+        {Array.from({ length: totalPages }, (_, index) => (
+          <button
+            key={index + 1}
+            onClick={() => handlePageChange(index + 1)}
+            className={`mx-1 px-4 py-2 rounded ${
+              currentPage === index + 1
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 text-black"
+            }`}
+          >
+            {index + 1}
+          </button>
+        ))}
       </div>
 
       {/* Content Section */}
