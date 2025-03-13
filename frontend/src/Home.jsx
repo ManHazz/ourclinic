@@ -3,6 +3,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { Link } from "react-router";
+import FeedbackModal from "./Components/FeedbackModal";
 
 const settings_first = {
   infinite: true,
@@ -185,6 +186,15 @@ function SamplePrevArrow(props) {
 }
 const Home = () => {
   const [navbar, setNavbar] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
   return (
     <>
       <div className="font-poppins flex flex-col justify-center items-center !bg-white">
@@ -278,8 +288,11 @@ const Home = () => {
               </div>
             </div>
             <div className="flex items-center justify-center gap-6 md:max-w-[241px] max-w-[185px] w-full py-3 rounded-[6px] text-white bg-[#3D518C] cursor-pointer">
-              <button className="text-sm md:text-xl font-small leading-4 md:leading-7 tracking-tight">
-                Tell Us What <br></br>You Think!
+              <button
+                className="text-sm md:text-xl font-small leading-4 md:leading-7 tracking-tight cursor-pointer"
+                onClick={openModal}
+              >
+                Tell Us What <br /> You Think!
               </button>
               <div>
                 <img src={"/button_arrow.svg"} alt="btn-arrow" />
@@ -287,6 +300,12 @@ const Home = () => {
             </div>
           </div>
         </div>
+        {isModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-white/20">
+            <FeedbackModal open={isModalOpen} onClose={closeModal} />
+          </div>
+        )}
+
         <div className="min-h-[700px] sm:min-h-[761px] w-full flex justify-center relative">
           <img
             src="/popular_lawyer_back.png"

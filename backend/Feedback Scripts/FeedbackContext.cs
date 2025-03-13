@@ -5,7 +5,6 @@ public class Feedback : ExcelBase
 {
     public string Mood { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
-    public string Verification { get; set; } = string.Empty;
 
     public Feedback() { }
 
@@ -44,7 +43,6 @@ public class Feedback : ExcelBase
                 worksheet.Cells[newRow, 1].Value = newRow - 1;
                 worksheet.Cells[newRow, 2].Value = feedback.Mood;
                 worksheet.Cells[newRow, 3].Value = feedback.Description;
-                worksheet.Cells[newRow, 4].Value = feedback.Verification;
 
                 package.SaveAs(new FileInfo(filePath));
             }
