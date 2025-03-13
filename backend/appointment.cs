@@ -1,31 +1,29 @@
+// ClinicLogic.cs - Handles business logic
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using ClosedXML.Excel;
 using System.IO;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 // Base class for Appointment
-class Appointment
+namespace Apt
 {
-    public string PatientName { get; set; }
-    public string Doctor { get; set; }
-    public string Day { get; set; }
-    public string TimeSlot { get; set; }
+public class Appointment
+{
+    public string PatientName { get; set; } = string.Empty;
+    public string Doctor { get; set; } = string.Empty;
+    public string Day { get; set; } = string.Empty;
+    public string TimeSlot { get; set; } = string.Empty;
 }
 
 // Derived class for Checkup
-class Checkup : Appointment
+public class Checkup : Appointment
 {
     public string Illness { get; set; }  // Checkup for illness
 }
 
 // Class for scheduling appointments
-class ClinicSchedule
+public class ClinicSchedule
 {
     private Dictionary<string, List<Checkup>> schedule = new Dictionary<string, List<Checkup>>();
     private const int MaxAppointmentsPerShift = 5;
@@ -54,7 +52,7 @@ class ClinicSchedule
 }
 
 // Class to load employee schedule from Excel
-class EmployeeScheduleLoader
+public class EmployeeScheduleLoader
 {
     public static Dictionary<string, List<string>> LoadSchedule(string filePath)
     {
@@ -84,7 +82,7 @@ class EmployeeScheduleLoader
 }
 
 // Class to load patient illness from Excel
-class PatientIllnessLoader
+public class PatientIllnessLoader
 {
     public static Dictionary<string, string> LoadPatientIllnesses(string filePath)
     {
@@ -104,62 +102,6 @@ class PatientIllnessLoader
             }
         }
         return patientIllnesses;
-    }
-}
-
-// Web API Backend
-namespace searchAppointment
-{
-public class search
-{
-    static void Main(string[] args)
-    {
-        var availableSchedules = EmployeeScheduleLoader.LoadSchedule("employee-db.xlsx");
-        var patientIllnesses = PatientIllnessLoader.LoadPatientIllnesses("patient.xlsx");
-        ClinicSchedule clinicSchedule = new ClinicSchedule();
-        
-        var builder = WebApplication.CreateBuilder(args);
-        builder.Services.AddSingleton(availableSchedules);
-        builder.Services.AddSingleton(patientIllnesses);
-        builder.Services.AddSingleton(clinicSchedule);
-        var app = builder.Build();
-        
-        app.UseRouting();
-        
-        app.UseEndpoints(endpoints =>
-        {
-            endpoints.MapGet("/api/appointments", async context =>
-            {
-                await context.Response.WriteAsJsonAsync(clinicSchedule.GetSchedule());
-            });
-            
-            endpoints.MapPost("/api/book", async context =>
-            {
-                var form = await context.Request.ReadFromJsonAsync<Checkup>();
-                string scheduleKey = $"{form.Day}_{form.TimeSlot}";
-                
-                if (patientIllnesses.TryGetValue(form.PatientName, out string illness))
-                {
-                    form.Illness = illness;
-                }
-                else
-                {
-                    form.Illness = "Unknown"; // Default if no illness found
-                }
-                
-                if (availableSchedules.ContainsKey(scheduleKey) && availableSchedules[scheduleKey].Contains(form.Doctor))
-                {
-                    var success = clinicSchedule.BookAppointment(form);
-                    await context.Response.WriteAsJsonAsync(new { success, form.Illness });
-                }
-                else
-                {
-                    await context.Response.WriteAsJsonAsync(new { success = false, message = "Invalid appointment selection" });
-                }
-            });
-        });
-        
-        app.Run();
     }
 }
 }
