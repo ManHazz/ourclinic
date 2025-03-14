@@ -1,48 +1,68 @@
 import React from "react";
 
-const MedCard = ({ image, name, type, balance }) => {
+const MedCard = ({ imageURL, name, type, balance }) => {
   const gotoGoogle = (name) => {
     window.open(`https://www.google.com/search?q=${name}`, "_blank");
   };
 
   return (
-    <div
-      className="h-screen overflow-hidden flex items-center justify-center"
-      style={{ background: "#DFEFFF" }}
-    >
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="max-w-[720px] mx-auto">
-          <div
-            className="relative flex flex-col text-gray-700 bg-white shadow-md bg-clip-border rounded-xl w-70 mr-7 ml-7"
-            style={{ background: "#DFEFFF" }}
-          >
-            <div className="relative mx-4 mt-4 overflow-hidden text-gray-700 bg-white bg-clip-border rounded-xl h-70">
-              <img
-                src={image}
-                alt="card-image"
-                className="object-cover w-full h-full"
-              />
+    <div className="group relative flex items-center justify-center mx-4 my-4">
+      {" "}
+      {/* Added margin */}
+      <div className="w-72 h-[480px] transform transition-all duration-300 hover:scale-105">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100/50 hover:shadow-2xl transition-shadow duration-300 h-full flex flex-col">
+          {/* Image Container */}
+          <div className="relative h-56 w-full overflow-hidden flex-shrink-0">
+            <img
+              src={imageURL}
+              alt={name}
+              className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-gray-900/30 to-transparent" />
+          </div>
+
+          {/* Content Container */}
+          <div className="p-6 flex flex-col flex-grow">
+            {/* Title Section */}
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-gray-800 truncate">
+                {name}
+              </h3>
+              <span className="px-3 py-1 rounded-full bg-indigo-100 text-indigo-800 text-sm font-medium whitespace-nowrap">
+                {type}
+              </span>
             </div>
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-2">
-                <p className="block font-sans text-base antialiased font-medium leading-relaxed text-blue-gray-900">
-                  {name}
-                </p>
-                <p className="block font-sans text-sm antialiased font-normal leading-normal text-gray-700 opacity-75">
-                  {type}
-                </p>
-              </div>
-              <p className="block font-sans text-sm antialiased font-normal leading-normal text-gray-700 opacity-75">
+
+            {/* Balance */}
+            <div className="flex items-center space-x-2 mb-6">
+              <svg
+                className="w-5 h-5 text-green-500 flex-shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+                />
+              </svg>
+              <p className="text-lg font-semibold text-gray-700 truncate">
                 {balance}
               </p>
             </div>
-            <div className="p-6 pt-0">
+
+            {/* Action Button */}
+            <div className="mt-auto">
               <button
-                className="align-middle select-none font-sans font-bold text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 px-6 rounded-lg shadow-gray-900/10 hover:shadow-gray-900/20 focus:opacity-[0.85] active:opacity-[0.85] active:shadow-none block w-full bg-blue-gray-900/10 text-blue-gray-900 shadow-none hover:scale-105 hover:shadow-none focus:scale-105 focus:shadow-none active:scale-100"
-                type="button"
                 onClick={() => gotoGoogle(name)}
+                className="w-full py-3 px-6 bg-gradient-to-r from-indigo-500 to-violet-600 text-white rounded-lg font-semibold
+                         transform transition-all duration-300 hover:from-indigo-600 hover:to-violet-700 hover:shadow-lg
+                         active:scale-95"
               >
-                More Info
+                More Details
+                <span className="ml-2">→</span>
               </button>
             </div>
           </div>

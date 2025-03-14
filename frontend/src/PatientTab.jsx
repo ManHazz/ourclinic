@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Footer from "./Components/Footer";
+import PatientList from "./Components/PatientList";
 
 let Navitem = ["Home", "Patients", "Schedules", "Appointments", "Medicines"];
 
@@ -10,12 +11,22 @@ const PatientTab = () => {
   return (
     <div className="font-poppins flex flex-col justify-center items-center !bg-white">
       {/* Navbar Section */}
-      <div className="w-full h-[110px] bg-[#EDF6FF] flex justify-center relative">
-        <div className="flex justify-between md:justify-between items-center px-5 w-full max-w-[1440px] sm:px-5 lg:px-24 sm:gap-7 md:gap-12 lg:gap-20 xl:gap-32">
-          {/* Logo */}
-          <a href="#" className="w-full max-w-fit">
-            <img src={"/logo.svg"} alt="logo" />
-          </a>
+      <div className="w-full h-[110px] bg-[#EDF6FF] flex justify-center">
+        <div className="flex justify-between items-center px-5 w-full max-w-[1440px]">
+          <div className="pl-4 md:pl-6 lg:pl-8 pt-4">
+            <div className="flex items-center space-x-4 w-max">
+              <a href="#" className="inline-block">
+                <img
+                  src="/ourclinic-logo-no-bg.png"
+                  alt="logo"
+                  className="w-[80px] md:w-[120px] lg:w-[150px] h-auto mb-5"
+                />
+              </a>
+              <span className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-800 mb-5">
+                OurClinic
+              </span>
+            </div>
+          </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex justify-center min-w-[200px] sm:min-w-[200px] md:min-w-[280px] gap-0 sm:gap-5 lg:min-w-[400px] xl:gap-20 w-full font-medium sm:text-xs xl:text-lg md:text-[15px] lg:text-[15px] tracking-tight leading-7">
@@ -23,7 +34,7 @@ const PatientTab = () => {
               <Link
                 key={index}
                 to={`/${navitem.toLowerCase()}`}
-                className="text-[#1C1C23] hover:text-[#DDA45C] font-semibold"
+                className="text-[#1C1C23] hover:text-indigo-700 font-semibold"
               >
                 {navitem}
               </Link>
@@ -69,73 +80,21 @@ const PatientTab = () => {
           alt="popular"
           className="absolute z-0 top-0 left-0 w-full h-full object-cover"
         />
-        {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-black opacity-50"></div>
-
-        {/* Table Container */}
-        <div className="relative z-10 bg-white bg-opacity-90 p-5 rounded-xl shadow-lg max-w-5xl w-full mx-5 overflow-x-auto">
-          <table className="w-full border-collapse">
-            {/* Table Header */}
-            <thead>
-              <tr className="bg-[#DDA45C] text-white">
-                {[
-                  "ID",
-                  "Name",
-                  "Age",
-                  "Problem",
-                  "Appointment Date",
-                  "Appointment Time",
-                  "Doctor",
-                ].map((header, index) => (
-                  <th key={index} className="p-3 text-left">
-                    <input
-                      type="text"
-                      className="w-full p-2 text-black rounded-md border border-gray-300"
-                      placeholder={header}
-                    />
-                  </th>
-                ))}
-              </tr>
-            </thead>
-
-            {/* Table Body */}
-            <tbody>
-              {[
-                {
-                  id: "123",
-                  name: "Goku",
-                  age: "23",
-                  problem: "Fever",
-                  date: "10/3",
-                  time: "12:30",
-                  doctor: "Dr. Wakanda",
-                },
-                {
-                  id: "124",
-                  name: "Gohan",
-                  age: "18",
-                  problem: "Headache",
-                  date: "12/5",
-                  time: "12:30",
-                  doctor: "Dr. Kumar",
-                },
-              ].map((patient, index) => (
-                <tr key={index} className="bg-white hover:bg-gray-100">
-                  <td className="p-3 border">{patient.id}</td>
-                  <td className="p-3 border">{patient.name}</td>
-                  <td className="p-3 border">{patient.age}</td>
-                  <td className="p-3 border">{patient.problem}</td>
-                  <td className="p-3 border">{patient.date}</td>
-                  <td className="p-3 border">{patient.time}</td>
-                  <td className="p-3 border">{patient.doctor}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <PatientList />
       </div>
 
       {/* Content Section */}
+      <div className="flex mt-5 flex-col gap-2.5 py-5 md:py-0 md:gap-12 items-center justify-center z-10">
+        <div className="md:text-4xl text-3xl leading-[60px] tracking-[0.02em] text-[#1C1C23] font-semibold">
+          Our Team!
+        </div>
+        <div className="md:text-lg text-base leading-[30px] tracking-[0.02em] text-[#1C1C23] font-normal text-center mb-15">
+          24/7 dedicated medical team ready to respond with expertise and
+          compassion - your health is our priority,
+          <br></br>
+          and we'll use every resource to ensure your best possible outcome.
+        </div>
+      </div>
       <Footer />
     </div>
   );
