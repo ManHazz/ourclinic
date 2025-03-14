@@ -101,7 +101,7 @@ let popularLawyer = [
     subTitle: "UI /UX Designer",
     exp: "20",
     reviews: "123",
-    img_lawyer: "/lawyer_one.png",
+    img_lawyer: "/Atif.png",
   },
   {
     mainTitle: "AIMAN HAZIMIN",
