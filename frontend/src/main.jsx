@@ -5,7 +5,7 @@ import "./index.css";
 import App from "./App.jsx";
 import Home from "./Home.jsx";
 import PatientTab from "./PatientTab.jsx";
-import SchedulesTab from "./Schedulestab.jsx";
+import SchedulesTab from "./SchedulesTab.jsx";
 import AppointmentTab from "./AppointmentTab.jsx";
 import MedicineTab from "./MedicineTab.jsx";
 

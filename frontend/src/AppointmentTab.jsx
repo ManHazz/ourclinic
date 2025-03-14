@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import AppointmentComponent from "./Components/AppointmentComponent";
 
 let Navitem = ["Home", "Patients", "Schedules", "Appointments", "Medicines"];
 
@@ -61,13 +62,14 @@ const AppointmentTab = () => {
         </div>
       </div>
 
-      {/* Popular Lawyer Background Fix */}
+      {/* Content and BG */}
       <div className="relative w-full md:min-h-[761px] min-h-[700px] flex justify-center items-center">
         <img
           src="/popular_lawyer_back.png"
           alt="popular"
           className="absolute top-0 left-0 w-full h-full object-cover"
         />
+        <AppointmentComponent />
       </div>
 
       {/* Content Section */}
