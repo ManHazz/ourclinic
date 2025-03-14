@@ -64,7 +64,7 @@ const FeedbackModal = ({ open, onClose }) => {
           <div className="relative rounded-2xl bg-white p-6 shadow">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="text-xl font-semibold text-gray-900">
-                Leave feedback
+                Leave a feedback
               </h2>
               <button
                 onClick={onClose}

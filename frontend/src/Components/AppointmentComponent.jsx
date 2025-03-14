@@ -55,7 +55,7 @@ const AppointmentComponent = () => {
                   d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                 ></path>
               </svg>
-              <p className="text-white">New Project</p>
+              <p className="text-white">New Appointment</p>
             </button>
           </div>
           <div className="w-full flex justify-center p-1 mb-4">
