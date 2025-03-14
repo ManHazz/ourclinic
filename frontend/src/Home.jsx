@@ -1,9 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { Link } from "react-router";
 import FeedbackModal from "./Components/FeedbackModal";
+import MedCard from "./Components/MedCard";
+import Footer from "./Components/Footer";
+import { ChatBubbleOvalLeftIcon, PhoneIcon } from "@heroicons/react/24/outline";
+
+const medicineURL = "http://localhost:5250/api/medicine";
 
 const settings_first = {
   infinite: true,
@@ -42,93 +47,48 @@ const settings_first = {
   ],
 };
 
-const settings = {
-  dots: true,
-  infinite: true,
-  arrows: false,
-  speed: 500,
-  slidesToShow: 3,
-  responsive: [
-    {
-      breakpoint: 1100,
-      settings: {
-        slidesToShow: 2,
-      },
-    },
-    {
-      breakpoint: 640,
-      settings: {
-        slidesToShow: 1,
-      },
-    },
-  ],
-};
-
 let Navitem = ["Home", "Patients", "Schedules", "Appointments", "Medicines"];
 
 let whychooseData = [
-  "CLIENT-FOCUSED SOLUTIONS AND RESULTS",
-  "FLEXIBLE, VALUE-DRIVEN APPROACH",
-  "BEYOND THE BILLABLE HOUR",
-  "WE POSSES LAW DEGREES AND LAW PRACTICE EXPERIENCE",
-];
-
-let popularcatData = [
-  {
-    title: "Divorce",
-    des: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Molestie in nibh tempor sit eros id sapien velit vitae. Blandit ultricies vivamus lectus ultrices mi sollicitudin magnis hendrerit.",
-    img: "/cat_one.png",
-  },
-  {
-    title: "Property",
-    des: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Molestie in nibh tempor sit eros id sapien velit vitae. Blandit ultricies vivamus lectus ultrices mi sollicitudin magnis hendrerit.",
-    img: "/cat_two.png",
-  },
-  {
-    title: "Real Estate",
-    des: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Molestie in nibh tempor sit eros id sapien velit vitae. Blandit ultricies vivamus lectus ultrices mi sollicitudin magnis hendrerit.",
-    img: "/cat_three.png",
-  },
-  {
-    title: "Divorce",
-    des: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Molestie in nibh tempor sit eros id sapien velit vitae. Blandit ultricies vivamus lectus ultrices mi sollicitudin magnis hendrerit.",
-    img: "/cat_one.png",
-  },
+  "HIGHLY QUALIFIED MEDICAL PROFESSIONALS",
+  "ADVANCED TECHNOLOGY AND TREATMENTS",
+  "PATIENT-CENTERED CARE",
+  "FOCUS ON PREVENTATIVE HEALTHCARE",
 ];
 
 let popularLawyer = [
   {
     mainTitle: "ATIF RIFQI",
     subTitle: "UI /UX Designer",
-    exp: "20",
+    exp: "Information Technology",
     reviews: "123",
     img_lawyer: "/lawyer_one.png",
   },
   {
     mainTitle: "AIMAN HAZIMIN",
     subTitle: "Team Leader",
-    exp: "20",
+    exp: "Computer Engineering",
     reviews: "123",
     img_lawyer: "/lawyer_two.png",
   },
   {
     mainTitle: "ARIQ DANISH",
     subTitle: "Backend Developer",
-    exp: "20",
+    exp: "Computer Engineering",
     reviews: "123",
     img_lawyer: "/lawyer_three.png",
   },
   {
     mainTitle: "AQIL ARMAN",
     subTitle: "UI /UX Developer",
-    exp: "20",
+    exp: "Information Technology",
     reviews: "123",
     img_lawyer: "/lawyer_one.png",
   },
   {
     mainTitle: "AHMAD AZRI",
     subTitle: "Backend Developer",
-    exp: "20",
+    exp: "Computer Engineering",
     reviews: "123",
     img_lawyer: "/lawyer_one.png",
   },
@@ -137,31 +97,31 @@ let popularLawyer = [
 let customer = [
   {
     cus_img: "/customer_one.svg",
-    cus_mainTitle: "JAMES MILNER",
+    cus_mainTitle: "Airil Ron",
     cus_subTitle: "CEO, Financial corp.",
     cus_content:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vel, orci lectus neque nascetur amet, suscipit feugiat. Et, diam tristique quisque platea viverra amet, eget.",
+      "The staff of the entire facility that I had contact with were very attentive, caring and efficient",
   },
   {
     cus_img: "/customer_three.svg",
-    cus_mainTitle: "JAMES MILNER",
+    cus_mainTitle: "Aiman Haziq",
     cus_subTitle: "CEO, Financial corp.",
     cus_content:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vel, orci lectus neque nascetur amet, suscipit feugiat. Et, diam tristique quisque platea viverra amet, eget.",
+      "I am so glad I chose this clinic! From the quick check-in to the thorough examination, everything was perfect. The doctor was very knowledgeable and patient, making me feel completely comfortable.",
   },
   {
-    cus_img: "/customer_one.svg",
-    cus_mainTitle: "JAMES MILNER",
+    cus_img: "/customer_two.svg",
+    cus_mainTitle: "Adam Mustaqim",
     cus_subTitle: "CEO, Financial corp.",
     cus_content:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vel, orci lectus neque nascetur amet, suscipit feugiat. Et, diam tristique quisque platea viverra amet, eget.",
+      "From registration to medical assistant to physician, everyone was kind and helpful and everything went smoothly and quickly. So appreciate having OurClinic close by for times when needed. Will not hesitate to visit again if need be",
   },
   {
     cus_img: "/customer_three.svg",
-    cus_mainTitle: "JAMES MILNER",
+    cus_mainTitle: "Haizad Ashraf",
     cus_subTitle: "CEO, Financial corp.",
     cus_content:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vel, orci lectus neque nascetur amet, suscipit feugiat. Et, diam tristique quisque platea viverra amet, eget.",
+      "I have visited this clinic for over 25 years. They are always friendly and generally run on time. Providers take time though to listen and allow plenty of time for questions. My wait today was a little long than usual but that is not typical.",
   },
 ];
 function SampleNextArrow(props) {
@@ -187,6 +147,24 @@ function SamplePrevArrow(props) {
 const Home = () => {
   const [navbar, setNavbar] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(medicineURL);
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        const data = await response.json();
+        setProducts(data.slice(0, 5)); // Only take first 5 items
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -198,45 +176,37 @@ const Home = () => {
   return (
     <>
       <div className="font-poppins flex flex-col justify-center items-center !bg-white">
+        {/* Header Section */}
         <div className="w-full h-[110px] bg-[#EDF6FF] flex justify-center">
-          <div className="flex justify-between md:justify-between items-center px-5 w-full max-w-[1440px] sm:px-5 lg:px-24 sm:gap-7 md:gap-12 lg:gap-20 xl:gap-32">
-            <a href="#_" className="w-full max-w-fit">
-              <img src={"/logo.svg"} alt="logo" />
-            </a>
+          <div className="flex justify-between items-center px-5 w-full max-w-[1440px]">
+            <div className="pl-4 md:pl-6 lg:pl-8 pt-4">
+              <div className="flex items-center space-x-4 w-max">
+                <a href="#" className="inline-block">
+                  <img
+                    src="/ourclinic-logo-no-bg.png"
+                    alt="logo"
+                    className="w-[80px] md:w-[120px] lg:w-[150px] h-auto mb-5"
+                  />
+                </a>
+                <span className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-800 mb-5">
+                  OurClinic
+                </span>
+              </div>
+            </div>
+
             <div className="hidden md:flex justify-center min-w-[200px] sm:min-w-[200px] md:min-w-[280px] gap-0 sm:gap-5 lg:min-w-[400px] xl:gap-20 w-full font-medium sm:text-xs xl:text-lg md:text-[15px] lg:text-[15px] tracking-tight leading-7">
               {Navitem.map((navitem, index) => {
                 return (
                   <Link
                     key={index}
                     to={`/${navitem.toLowerCase()}`} // Dynamic route
-                    className="text-[#1C1C23] hover:text-[#DDA45C] font-semibold"
+                    className="text-[#1C1C23] hover:text-indigo-700 font-semibold"
                   >
                     {navitem}
                   </Link>
                 );
               })}
             </div>
-
-            {/*
-            <div className=" hidden md:flex items-center justify-center gap-6">
-              <a
-                href="#_"
-                className="xl:min-w-[141px] md:min-w-[80px] sm:min-w-[60px] w-full sm:py-2.5 sm:px-5 xl:py-2.5 md:py-1 flex justify-center items-center rounded-[5px] border border-[#DDA45C]"
-              >
-                <button className="font-normal sm:text-xs xl:text-lg md:text-xs lg:text-sm leading-7 tracking-tight">
-                  Login
-                </button>
-              </a>
-              <a
-                href="#_"
-                className="xl:min-w-[141px] md:min-w-[80px] sm:min-w-[60px] sm:py-2.5 sm:px-5 w-full xl:py-2.5 md:py-1 flex justify-center items-center text-white rounded-[5px] bg-[#DDA45C]"
-              >
-                <button className="font-normal xl:text-lg sm:text-xs md:text-xs lg:text-sm leading-7 tracking-tight">
-                  Register
-                </button>
-              </a>
-            </div>
-            */}
             <div
               className={
                 navbar
@@ -267,36 +237,41 @@ const Home = () => {
             </div>
           </div>
         </div>
-        <div className="pt-[5%] z-10 md:pt-[30%] lg:pt-[15%] relative xl:pt-0 w-full md:min-h-[609px] min-h-[400px] flex flex-col items-center md:gap-16 sm:gap-10 gap-7 justify-center">
-          <div className="w-full md:h-[609px] h-[400px]  top-0 absolute">
-            <div className="h-full w-full bg-black z-20  opacity-[0.5] absolute"></div>
-            <img
-              src={"/background_landing.png"}
-              alt="btn-arrow"
-              className="w-full md:h-[609px] h-[400px] z-10  object-left-top object-cover"
-            />
-          </div>
-          <div className="absolute flex justify-center flex-col items-center gap-14 z-30">
-            <div className="flex flex-col gap-5 md:gap-5">
-              <div className="text-center text-white mx-auto text-2xl leading-9 sm:text-5xl sm:leading-[50px] md:text-4xl lg:text-5xl md:leading-[48px] lg:leading-[60px] font-extrabold lg:max-w-[514px] md:max-w-[414px] max-w-[300px] sm:max-w-[550px]">
-                <span className="text-[#ABD2FA]"> You</span>, Me,
-                <span className="text-[#7692FF]"> OurClinic</span>
-              </div>
-              <div className="text-white text-center md:max-w-[613px] max-w-[380px] sm:max-w-[500px] text-sm md:text-xl leading-5 md:leading-[28px] tracking-[0.02em]">
-                Home is where the heart is
-                <br></br>
-              </div>
-            </div>
-            <div className="flex items-center justify-center gap-6 md:max-w-[241px] max-w-[185px] w-full py-3 rounded-[6px] text-white bg-[#3D518C] cursor-pointer">
+        <div className="relative w-full min-h-screen flex items-center justify-center overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-indigo-600 opacity-95 z-0"></div>
+          <img
+            src="/doctor-bg-2.jpg"
+            alt="Medical Team"
+            className="absolute inset-0 w-full h-full object-cover object-center z-0"
+          />
+          <div className="relative z-10 text-center px-4">
+            <div className="max-w-4xl mx-auto">
+              <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
+                <span
+                  className="text-5xl md:text-7xl font-bold mt-4 block 
+           [text-shadow:_2px_3px_3px_rgba(0,0,0,0.3)]
+           hover:[text-shadow:_3px_4px_8px_rgb(139_92_246_/_80%)]
+           transition-all duration-300 hover:scale-105"
+                >
+                  Advanced Healthcare
+                </span>
+                <br />
+                <span
+                  className="text-3xl md:text-4xl font-medium mt-4 block 
+                 [text-shadow:_1px_2px_2px_rgba(0,0,0,0.3)]
+                 hover:[text-shadow:_1px_2px_6px_rgb(124_58_237_/_60%)]
+                 transition-shadow duration-300"
+                >
+                  Where Compassion Meets Innovation
+                </span>
+              </h1>
               <button
-                className="text-sm md:text-xl font-small leading-4 md:leading-7 tracking-tight cursor-pointer"
                 onClick={openModal}
+                className="inline-flex items-center bg-white text-indigo-600 px-8 py-3 rounded-full font-bold hover:bg-indigo-50 transition-all duration-300"
               >
-                Tell Us What <br /> You Think!
+                <ChatBubbleOvalLeftIcon className="w-5 h-5 mr-2" />
+                Write About Us!
               </button>
-              <div>
-                <img src={"/button_arrow.svg"} alt="btn-arrow" />
-              </div>
             </div>
           </div>
         </div>
@@ -344,11 +319,10 @@ const Home = () => {
                           <div className="h-[1px] w-full !bg-white"></div>
                           <div className="flex flex-col gap-7 mx-auto max-w-[308px] xl:max-w-[308px] lg:max-w-[280px] w-full px-1">
                             <div className=" pt-3.5 w-full items-center flex justify-between">
-                              <div className="w-[87px] text-start text-base font-normal leading-5">
-                                <span className="font-semibold">
-                                  {data.exp}+
-                                </span>
-                                Yrs Experience
+                              <div className="w-[87px] text-start text-base font-semibold leading-5">
+                                Bachelor in
+                                <br></br>
+                                <span className="font-normal">{data.exp}</span>
                               </div>
                               <div>
                                 <div className="flex items-center gap-1.5">
@@ -367,15 +341,15 @@ const Home = () => {
                               </div>
                             </div>
                             <div className="flex justify-between">
-                              <div className="max-w-[128px] w-full py-2 bg-[#DDA45C] rounded-[4px] flex justify-center cursor-pointer">
+                              <div className="max-w-[128px] w-full py-2 bg-[#B388EB] rounded-[4px] flex justify-center cursor-pointer">
                                 <button className="text-white flex items-center justify-center gap-2.5">
-                                  <i src={"/call.svg"} alt="call" />
+                                  <PhoneIcon className="w-5 h-5" />
                                   Call Now
                                 </button>
                               </div>
-                              <div className="max-w-[128px] w-full py-2 rounded-[4px] border-[1px] border-[#DDA45C] flex justify-center cursor-pointer">
+                              <div className="max-w-[128px] w-full py-2 rounded-[4px] border-[1px] border-[#B388EB] flex justify-center cursor-pointer">
                                 <button className="flex items-center justify-center gap-2.5">
-                                  <img src={"/chat.svg"} alt="chat" />
+                                  <ChatBubbleOvalLeftIcon className="w-5 h-5" />
                                   Chat Now
                                 </button>
                               </div>
@@ -388,64 +362,35 @@ const Home = () => {
                 })}
               </Slider>
             </div>
-            {/*    VIEW ALL BUTTON
-            <div className="max-w-[158px] px-[35px] mx-auto mt-10 sm:mt-0 bg-[#DDA45C] py-[11px] flex items-center text-white justify-center rounded-[6px] cursor-pointer">
-              <button className="text-base leading-6 tracking-[0.02em] font-normal">
-                View All
-              </button>
-            </div>
-            */}
           </div>
         </div>
-        <div className="mt-5 md:mt-14 flex flex-col items-center gap-6 lg:gap-14 md:gap-7">
-          <div className="lg:text-[40px] text-[28px] md:text-[30px] leading-[68px] tracking-[0.02em] text-[#1C1C23] font-semibold">
-            Popular Categories
-          </div>
-          <div className="flex md:flex-row  xl:gap-12 md:px-[2%] md:gap-7 lawyers">
-            <Slider {...settings_first}>
-              {popularcatData.map((data, index) => {
-                return (
-                  <div key={index} className="w-full flex justify-center">
-                    <div
-                      className={`relative bg-black rounded-[8px] bg-no-repeat bg-cover w-full min-h-[377px] flex justify-center items-end`}
-                    >
-                      <div
-                        style={{
-                          backgroundImage: `url(${data.img})`,
-                          backgroundSize: "cover",
-                        }}
-                        className={`w-full absolute rounded-[8px] bg-black opacity-[0.4] min-h-[377px] h-full `}
-                      ></div>
 
-                      <div className="rounded-[8px] absolute z-10 flex flex-col  xl:gap-7 lg:gap-2.5 md:gap-3.5 top-7 left-11 pr-2">
-                        <div className="xl:text-[32px] lg:text-[28px] text-xl md:text-[30px] text-start leading-[48px] text-white font-semibold">
-                          {data.title}
-                        </div>
-                        <div className="lg:max-w-fit max-w-xs xl:max-w-fit md:max-w-fit pr-0 md:pr-[20%] lg:pr-[15%] text-justify text-white lg:text-xl text-lg  md:leading-[32px] lg:leading-7 font-normal description-truncate">
-                          {data.des}
-                        </div>
-                        <div className="flex item-center gap-4 text-[#DDA45C] text-start lg:text-xl text-lg leading-7 font-medium cursor-pointer w-fit">
-                          <span>Explore</span>
-                          <div className="flex items-center">
-                            <img src={"/Cat_arrow.svg"} alt="" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+        {/* meds */}
+        <div className="w-full py-16 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 text-center mb-12">
+              Featured Medicines
+            </h2>
+            <div className="px-4">
+              <Slider {...settings_first}>
+                {products.slice(0, 5).map((product, index) => (
+                  <div key={index} className="px-2">
+                    <MedCard
+                      imageURL={product.imageURL}
+                      name={product.name}
+                      type={product.type}
+                      balance={product.balance}
+                    />
                   </div>
-                );
-              })}
-            </Slider>
-          </div>
-          <div>
-            <div className="px-[24px] text-white leading-6 tracking-[0.02em] font-normal py-2.5 bg-[#DDA45C] rounded-[6px] mt-10 sm:mt-0 cursor-pointer">
-              <button className="text-base">All Categories</button>
+                ))}
+              </Slider>
             </div>
           </div>
         </div>
+
         <div className="mt-14 relative flex w-full bg-chooseus-back bg-cover md:min-h-[500px] min-h-[400px]">
           <img
-            src="/chooseus_back.png"
+            src="/doctor-bg.jpg"
             alt="popular"
             className="md:h-[500px] h-[400px] object-cover absolute w-full object-left-top"
           />
@@ -468,163 +413,41 @@ const Home = () => {
             </div>
           </div>
         </div>
-        <div className="mt-10 min-h-[440px] flex flex-col gap-5 lg:gap-14 xl:max-w-[1234px]">
-          <div className="lg:text-[40px] text-center text-lg sm:text-[30px] leading-[60px] tracking-[0.02em] text-[#1C1C23] font-semibold">
-            Hear it From Our Customers
-          </div>
-          <div className="mb-5 flex template justify-center xl:max-w-[1234px] lawyers">
-            <Slider {...settings} className="flex justify-center">
-              {customer.map((data, index) => {
-                return (
-                  <div className="w-full !flex !justify-center" key={index}>
-                    <div className="hover:scale-95 duration-1000 max-w-[365px] w-full min-h-[278px] flex flex-col gap-3.5 bg-[#FFFFFF] shadow-xl rounded-b-[5px]">
-                      <div className="flex items-center gap-3.5 px-6 pt-4">
-                        <div>
-                          <img src={data.cus_img} alt="one" />
-                        </div>
-                        <div className="mr-[34px]">
-                          <div className="text-base md:text-lg whitespace-nowrap leading-7 tracking-[0.04em] text-[#1C1C23] font-normal">
-                            {data.cus_mainTitle}
-                          </div>
-                          <div className="text-xs text-start leading-[18px] tracking-[0.04em] text-[#707070] font-medium">
-                            {data.cus_subTitle}
-                          </div>
-                        </div>
-                        <div>
-                          <img src={"/quote_mark.svg"} alt="icon" />
-                        </div>
-                      </div>
-                      <div className=" w-full border-b-2 border-[#DDA45C] py-3"></div>
-                      <div className="text-justify px-6 mt-2.5 pb-[25px]">
-                        {data.cus_content}
-                      </div>
+        <div className="w-full py-16 bg-white">
+          <div className="max-w-7xl mx-auto px-4">
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 text-center mb-12">
+              From Our Beloved Patients
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {customer.map((testimonial, index) => (
+                <div
+                  key={index}
+                  className="bg-gray-199 p-8 rounded-xl hover:shadow-lg hover:shadow-violet-400 transition-shadow"
+                >
+                  <div className="flex items-center mb-4">
+                    <img
+                      src={testimonial.cus_img}
+                      alt={testimonial.cus_mainTitle}
+                      className="w-16 h-16 rounded-full object-cover mr-4"
+                    />
+                    <div>
+                      <h4 className="text-xl font-semibold">
+                        {testimonial.cus_mainTitle}
+                      </h4>
+                      <p className="text-indigo-600">
+                        {testimonial.cus_subTitle}
+                      </p>
                     </div>
                   </div>
-                );
-              })}
-            </Slider>
-          </div>
-        </div>
-        <div className="w-full">
-          <div className="flex md:mt-14 mt-0 flex-col items-center justify-center max-h-fit xl:max-w-full w-full bg-[#000D13]">
-            <div className="flex gap-5 px-3 xl:gap-28 lg:gap-12 flex-col md:flex-row md:gap-5 justify-center mt-8 md:mt-14 xl:px-0 md:px-7 max-w-xl md:max-w-7xl">
-              <div className="flex flex-col gap-3.5 lg:gap-6 md:gap-3.5">
-                <a href="#_" className="max-w-fit -mt-2.5">
-                  <img src={"/logofooter.svg"} alt="footer" />
-                </a>
-                <div className="text-[#F2F2F2] xl:max-w-[249px] lg:max-w-[249px] md:max-w-[190px] text-justify xl:text-base md:text-xs lg:text-sm leading-6 tracking-[0.02em] font-normal">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Massa
-                  habitant enim eget at non, integer non tempus.
+                  <p className="text-gray-600 italic">
+                    "{testimonial.cus_content}"
+                  </p>
                 </div>
-                <div className="flex justify-between max-w-[200px] lg:gap-7 gap-3.5 items-center">
-                  <img
-                    src={"/facebookicon.svg"}
-                    alt="facebook"
-                    className="cursor-pointer"
-                  />
-                  <img
-                    src={"/linkedinicon.svg"}
-                    alt="linkedin"
-                    className="cursor-pointer"
-                  />
-                  <img
-                    src={"/twittericon.svg"}
-                    alt="twitter"
-                    className="cursor-pointer"
-                  />
-                  <img
-                    src={"/instagramicon.svg"}
-                    alt="instagram"
-                    className="cursor-pointer"
-                  />
-                </div>
-              </div>
-              <div className="flex flex-col md:gap-6 gap-2.5">
-                <div className="text-[#DDA45C] xl:text-xl lg:text-lg md:text-sm leading-7 tracking-[0.02em] text-justify font-semibold">
-                  Links
-                </div>
-                {Navitem.map((navitem, index) => {
-                  return (
-                    <a
-                      key={index}
-                      href="#_"
-                      className="text-[#F2F2F2] xl:text-base lg:text-sm md:text-xs leading-6 font-normal text-justify"
-                    >
-                      {navitem}
-                    </a>
-                  );
-                })}
-              </div>
-              <div className="flex flex-col md:gap-6 gap-2.5">
-                <div className="text-[#DDA45C] xl:text-xl lg:text-lg md:text-sm leading-7 tracking-[0.02em] text-justify font-semibold">
-                  Services
-                </div>
-                <div className="flex gap-8 w-full text-[#F2F2F2] xl:text-base lg:text-sm md:text-xs leading-6 font-normal text-justify">
-                  <a href="#_" className="lg:w-28 w-24 md:w-20">
-                    Drug crime
-                  </a>
-                  <a href="#_">Evading</a>
-                </div>
-                <div className="flex gap-8 text-[#F2F2F2] xl:text-base lg:text-sm md:text-xs leading-6 font-normal text-justify">
-                  <a href="#_" className="lg:w-28 w-24 md:w-20">
-                    Robbery
-                  </a>
-                  <a href="#_">Hit and Run</a>
-                </div>
-                <div className="flex gap-8 text-[#F2F2F2] xl:text-base lg:text-sm md:text-xs leading-6 font-normal text-justify">
-                  <a href="#_" className="lg:w-28 w-24 md:w-20">
-                    Investigations
-                  </a>
-                  <a href="#_" className="tett-strat flex justify-start">
-                    Theft
-                  </a>
-                </div>
-                <div className="flex gap-8 text-[#F2F2F2] xl:text-base lg:text-sm md:text-xs leading-6 font-normal text-justify">
-                  <a href="#_" className=" lg:w-28 w-24 md:w-20">
-                    Assault
-                  </a>
-                  <a href="#_" className="whitespace-nowrap">
-                    Disturbing the peace
-                  </a>
-                </div>
-              </div>
-              <div className="flex flex-col gap-2.5 lg:gap-6 md:gap-3.5">
-                <div className="text-[#DDA45C] xl:text-xl lg:text-lg md:text-sm leading-7 tracking-[0.02em] text-justify font-semibold">
-                  Contact
-                </div>
-                <div className="max-w-[243px] text-[#F2F2F2] xl:text-base lg:text-sm md:text-xs leading-6 font-normal text-start">
-                  802, Orbit complex, C.G Road, Ahmedabad, 380009.
-                </div>
-                <div className="text-[#F2F2F2] xl:text-base lg:text-sm md:text-xs leading-6 font-normal text-justify">
-                  +91 12345 67890
-                </div>
-                <div className="text-[#F2F2F2] xl:text-base lg:text-sm md:text-xs leading-6 font-normal text-justify">
-                  info.advocate@gmail.com
-                </div>
-                <div className="text-[#F2F2F2]  text-sm leading-6 font-normal text-justify">
-                  <a href="#_">
-                    <div className="xl:max-w-[211px] lg:max-w-[170px] md:max-w-[170px] lg:py-3 md:py-2 py-2.5 bg-[#DDA45C] text-center text-white font-medium">
-                      <button>Book free Consultation</button>
-                    </div>
-                  </a>
-                </div>
-              </div>
-            </div>
-            <div className="h-[1.17px] md:mt-3.5 mt-2.5 w-full bg-[#A3A3A3]"></div>
-            <div className="flex gap-2 items-start px-3 xl:px-0 md:px-7 md:flex-row justify-between md:items-center w-full max-w-xl md:max-w-7xl flex-wrap md:mt-7 mt-2.5 mb-3.5">
-              <div className="text-white text-sm xl:text-base whitespace-nowrap lg:text-sm md:text-xs flex items-center gap-1">
-                OurClinic
-                <img src={"/copyright.svg"} alt="copyright" />
-                {new Date().getFullYear()} All Rights Reserved
-              </div>
-              <div className="flex md:gap-4 gap-1.5 whitespace-nowrap text-white font-normal leading-6 text-sm xl:text-base lg:text-sm md:text-xs tracking-[0.02em]">
-                <div className="cursor-pointer">Terms of Service</div>
-                <div>|</div>
-                <div className="cursor-pointer">Privacy Policy</div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
+        <Footer />
       </div>
     </>
   );

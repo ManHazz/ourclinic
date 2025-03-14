@@ -7,6 +7,7 @@ public class Medicine : ExcelBase
     public string ID { get; set; } = string.Empty;
     public string Type { get; set; } = string.Empty; // Tablet, capsule, syrup
     public string Balance { get; set; } = string.Empty; 
+    public string imageURL { get; set; } = string.Empty;
 
     public override string GetFilePath()
     {
@@ -34,6 +35,7 @@ public class Medicine : ExcelBase
                     Name = row.Cell(2).GetString(),
                     Type = row.Cell(3).GetString(),
                     Balance = row.Cell(4).GetString(),
+                    imageURL = row.Cell(5).GetString()
                 });
             }
         }

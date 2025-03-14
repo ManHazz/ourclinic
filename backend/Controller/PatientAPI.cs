@@ -1,24 +1,34 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 [ApiController]
 [Route("api/patient")]
 public class PatientController : ControllerBase
 {
-    [HttpGet("search")]
-    public IActionResult SearchPatient([FromQuery] string name)
+    [HttpGet]
+    public IActionResult GetAllPatients()
     {
-        if (string.IsNullOrWhiteSpace(name))
+        try
         {
-            return BadRequest("Error: Search name cannot be empty.");
+            // Fetch all patients from the Excel file
+            List<Patient> patients = Patient.GetAllPatients();
+
+            // Check if any patients were found
+            if (patients.Count == 0)
+            {
+                return NotFound("No patients found in the database.");
+            }
+
+            // Return the list of patients as JSON
+            return Ok(patients);
         }
-
-        List<Patient> patients = Patient.SearchPatient(name);
-
-        if (patients.Count == 0)
+        catch (FileNotFoundException ex)
         {
-            return NotFound("No matching patients found.");
+            return StatusCode(500, $"Error: Patient database not found. Details: {ex.Message}");
         }
-
-        return Ok(patients); // Returns a JSON list of patients
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error: An unexpected error occurred. Details: {ex.Message}");
+        }
     }
 }

@@ -1,322 +1,427 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import {
+  UserCircleIcon,
+  CalendarIcon,
+  ClockIcon,
+  MagnifyingGlassIcon,
+} from "@heroicons/react/24/outline";
 
 const AppointmentComponent = () => {
-  // Function to open the modal
-  const openModal = () => {
+  const [appointments, setAppointments] = useState([]);
+  const [scheduleData, setScheduleData] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [appointmentsPerPage] = useState(6);
+  const [formData, setFormData] = useState({
+    name: "",
+    age: "",
+    illness: "",
+    doctor: "",
+    timeSlot: "day",
+    day: "Monday",
+  });
+  const [loading, setLoading] = useState({
+    appointments: true,
+    schedule: true,
+  });
+  const [error, setError] = useState(null);
+
+  // Fetch data on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch appointments
+        const appointmentsRes = await fetch(
+          "http://localhost:5250/api/patient"
+        );
+        const appointmentsData = await appointmentsRes.json();
+        setAppointments(
+          Array.isArray(appointmentsData) ? appointmentsData : []
+        );
+
+        // Fetch schedule data
+        const scheduleRes = await fetch(
+          "http://localhost:5250/api/employee/doctors"
+        );
+        const scheduleData = await scheduleRes.json();
+        setScheduleData(scheduleData);
+
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading({ appointments: false, schedule: false });
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Update available doctors when day changes
+  const availableDoctors = scheduleData.reduce((acc, employee) => {
+    if (employee.day === formData.day) {
+      acc.push({
+        name: employee.name,
+        shift: employee.shift,
+      });
+    }
+    return acc;
+  }, []);
+
+  // Filtering and pagination logic
+  const filteredAppointments = appointments.filter((appointment) =>
+    Object.values(appointment).some((value) =>
+      String(value).toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  );
+
+  const indexOfLast = currentPage * appointmentsPerPage;
+  const indexOfFirst = indexOfLast - appointmentsPerPage;
+  const currentAppointments = filteredAppointments.slice(
+    indexOfFirst,
+    indexOfLast
+  );
+  const totalPages = Math.ceil(
+    filteredAppointments.length / appointmentsPerPage
+  );
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+      ...(name === "day" && { doctor: "" }), // Reset doctor when day changes
+    }));
+  };
+
+  const handleBookAppointment = async (e) => {
+    e.preventDefault();
+    if (!availableDoctors.some((doc) => doc.name === formData.doctor)) {
+      alert("Please select a valid doctor for the selected day");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        "http://localhost:5250/api/appointment/book",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
+
+      if (!response.ok) throw new Error(await response.text());
+
+      // Refresh appointments
+      const updatedRes = await fetch("http://localhost:5250/api/patient");
+      setAppointments(await updatedRes.json());
+
+      closeModal();
+      setFormData({
+        name: "",
+        age: "",
+        illness: "",
+        doctor: "",
+        timeSlot: "day",
+        day: "Monday",
+      });
+    } catch (err) {
+      console.error("Booking error:", err);
+      alert(err.message);
+    }
+  };
+
+  const openModal = () =>
     document.getElementById("myModal").classList.remove("hidden");
-  };
-
-  // Function to close the modal
-  const closeModal = () => {
+  const closeModal = () =>
     document.getElementById("myModal").classList.add("hidden");
-  };
-
-  // Function to handle project creation
-  const createProject = () => {
-    const projectName = document.getElementById("projectName").value;
-    const projectDescription =
-      document.getElementById("projectDescription").value;
-    const inviteFriend = document.getElementById("inviteFriend").value;
-
-    // Add your logic to handle the project creation here
-    console.log("Project Name: " + projectName);
-    console.log("Project Description: " + projectDescription);
-    console.log("Invite Friend: " + inviteFriend);
-
-    // Close the modal after handling the creation
-    closeModal();
-  };
 
   return (
-    <div
-      className="h-screen overflow-hidden flex items-center justify-center"
-      style={{ background: "#edf2f7" }}
-    >
-      <div className="bg-gradient-to-r from-violet-100 to-indigo-100 flex items-center justify-center h-screen">
-        <div className="w-11/12 sm:w-11/12 md:w-8/12 lg:w-6/12 backdrop-blur-sm bg-white/40 p-6 rounded-lg shadow-sm border-violet-200 border">
-          <div className="w-full flex justify-between items-center p-3">
-            <h2 className="text-xl font-semibold">Upcoming Appointments</h2>
-            <button
-              id="openModalBtn"
-              className="flex items-center bg-gradient-to-r from-violet-300 to-indigo-300 border border-fuchsia-00 hover:border-violet-100 text-white font-semibold py-2 px-4 rounded-md transition-colors duration-300"
-              onClick={openModal}
-            >
-              <svg
-                className="w-4 h-4 mr-2 text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+    <div className="min-h-screen bg-gray-50 flex items-start justify-center p-8 z-1">
+      <div className="w-full max-w-9xl bg-white rounded-2xl shadow-xl border border-gray-200">
+        {/* Header Section */}
+        <div className="px-8 py-6 border-b border-gray-200 bg-gradient-to-r from-violet-50 to-indigo-50">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800">
+                Patient Directory
+              </h1>
+              <p className="text-sm text-gray-500 mt-1">
+                {filteredAppointments.length} records found
+              </p>
+            </div>
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search appointments..."
+                  className="pl-10 pr-4 py-2 w-64 rounded-lg border-2 border-gray-200 focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-200 text-sm transition-all"
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                />
+                <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" />
+              </div>
+              <button
+                onClick={openModal}
+                className="flex items-center bg-violet-500 hover:bg-violet-600 text-white font-medium py-2 px-4 rounded-lg transition-colors gap-2"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                ></path>
-              </svg>
-              <p className="text-white">New Appointment</p>
-            </button>
-          </div>
-          <div className="w-full flex justify-center p-1 mb-4">
-            <div className="relative w-full">
-              <input
-                type="text"
-                className="w-full backdrop-blur-sm bg-white/20 py-2 pl-10 pr-4 rounded-lg focus:outline-none border-2 border-gray-100 focus:border-violet-300 transition-colors duration-300"
-                placeholder="Search..."
-              />
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg
-                  className="w-4 h-4 text-gray-800 dark:text-white"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
+                  className="w-5 h-5"
                   fill="none"
-                  viewBox="0 0 20 20"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
                   <path
-                    stroke="currentColor"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth="2"
-                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                   />
                 </svg>
-              </div>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-4">
-            {/* Card 1 */}
-            <div className="backdrop-blur-sm bg-white/20 p-6 rounded-md shadow-sm cursor-pointer border-2 border-gray-50 hover:border-violet-200 hover:border-2 transition-colors duration-300">
-              <h2 className="text-xl font-semibold mb-4">Project 1</h2>
-              <p className="text-gray-700">
-                Description of Project 2 goes here. You can provide more details
-                about the project.
-              </p>
-              <div className="col-start-2 row-start-1 row-end-3 sm:mt-4 lg:mt-4 xl:mt-4">
-                <dd className="flex justify-end sm:justify-start lg:justify-end xl:justify-start -space-x-1.5">
-                  <img
-                    src="https://placekitten.com/48/48"
-                    alt=""
-                    className="w-6 h-6 rounded-full bg-violet-100"
-                    loading="lazy"
-                  />
-                  <img
-                    src="https://placekitten.com/49/49"
-                    alt=""
-                    className="w-6 h-6 rounded-full bg-violet-100"
-                    loading="lazy"
-                  />
-                  <img
-                    src="https://placekitten.com/50/50"
-                    alt=""
-                    className="w-6 h-6 rounded-full bg-violet-100"
-                    loading="lazy"
-                  />
-                  <img
-                    src="https://placekitten.com/51/51"
-                    alt=""
-                    className="w-6 h-6 rounded-full bg-violet-100"
-                    loading="lazy"
-                  />
-                  <img
-                    src="https://placekitten.com/52/52"
-                    alt=""
-                    className="w-6 h-6 rounded-full bg-violet-100"
-                    loading="lazy"
-                  />
-                </dd>
-              </div>
-            </div>
-            {/* Card 2 */}
-            <div className="backdrop-blur-sm bg-white/20 p-6 rounded-md shadow-sm cursor-pointer border-2 border-gray-50 hover:border-violet-200 hover:border-2 transition-colors duration-300">
-              <h2 className="text-xl font-semibold mb-4">Project 2</h2>
-              <p className="text-gray-700">
-                Description of Project 2 goes here. You can provide more details
-                about the project.
-              </p>
-              <div className="col-start-2 row-start-1 row-end-3 sm:mt-4 lg:mt-4 xl:mt-4">
-                <dd className="flex justify-end sm:justify-start lg:justify-end xl:justify-start -space-x-1.5">
-                  <img
-                    src="https://placekitten.com/48/48"
-                    alt=""
-                    className="w-6 h-6 rounded-full bg-violet-100"
-                    loading="lazy"
-                  />
-                  <img
-                    src="https://placekitten.com/49/49"
-                    alt=""
-                    className="w-6 h-6 rounded-full bg-violet-100"
-                    loading="lazy"
-                  />
-                  <img
-                    src="https://placekitten.com/50/50"
-                    alt=""
-                    className="w-6 h-6 rounded-full bg-violet-100"
-                    loading="lazy"
-                  />
-                  <img
-                    src="https://placekitten.com/51/51"
-                    alt=""
-                    className="w-6 h-6 rounded-full bg-violet-100"
-                    loading="lazy"
-                  />
-                  <img
-                    src="https://placekitten.com/52/52"
-                    alt=""
-                    className="w-6 h-6 rounded-full bg-violet-100"
-                    loading="lazy"
-                  />
-                </dd>
-              </div>
-            </div>
-            {/* Card 3 */}
-            <div className="backdrop-blur-sm bg-white/20 p-6 rounded-md shadow-sm cursor-pointer border-2 border-gray-50 hover:border-violet-200 hover:border-2 transition-colors duration-300">
-              <h2 className="text-xl font-semibold mb-4">Project 3</h2>
-              <p className="text-gray-700">
-                Description of Project 2 goes here. You can provide more details
-                about the project.
-              </p>
-              <div className="col-start-2 row-start-1 row-end-3 sm:mt-4 lg:mt-4 xl:mt-4">
-                <dd className="flex justify-end sm:justify-start lg:justify-end xl:justify-start -space-x-1.5">
-                  <img
-                    src="https://placekitten.com/48/48"
-                    alt=""
-                    className="w-6 h-6 rounded-full bg-violet-100"
-                    loading="lazy"
-                  />
-                  <img
-                    src="https://placekitten.com/49/49"
-                    alt=""
-                    className="w-6 h-6 rounded-full bg-violet-100"
-                    loading="lazy"
-                  />
-                  <img
-                    src="https://placekitten.com/50/50"
-                    alt=""
-                    className="w-6 h-6 rounded-full bg-violet-100"
-                    loading="lazy"
-                  />
-                  <img
-                    src="https://placekitten.com/51/51"
-                    alt=""
-                    className="w-6 h-6 rounded-full bg-violet-100"
-                    loading="lazy"
-                  />
-                  <img
-                    src="https://placekitten.com/52/52"
-                    alt=""
-                    className="w-6 h-6 rounded-full bg-violet-100"
-                    loading="lazy"
-                  />
-                </dd>
-              </div>
-            </div>
-            {/* Card 4 */}
-            <div className="backdrop-blur-sm bg-white/20 p-6 rounded-md shadow-sm cursor-pointer border-2 border-gray-50 hover:border-violet-200 hover:border-2 transition-colors duration-300">
-              <h2 className="text-xl font-semibold mb-4">Project 4</h2>
-              <p className="text-gray-700">
-                Description of Project 2 goes here. You can provide more details
-                about the project.
-              </p>
-              <div className="col-start-2 row-start-1 row-end-3 sm:mt-4 lg:mt-4 xl:mt-4">
-                <dd className="flex justify-end sm:justify-start lg:justify-end xl:justify-start -space-x-1.5">
-                  <img
-                    src="https://placekitten.com/48/48"
-                    alt=""
-                    className="w-6 h-6 rounded-full bg-violet-100"
-                    loading="lazy"
-                  />
-                  <img
-                    src="https://placekitten.com/49/49"
-                    alt=""
-                    className="w-6 h-6 rounded-full bg-violet-100"
-                    loading="lazy"
-                  />
-                  <img
-                    src="https://placekitten.com/50/50"
-                    alt=""
-                    className="w-6 h-6 rounded-full bg-violet-100"
-                    loading="lazy"
-                  />
-                  <img
-                    src="https://placekitten.com/51/51"
-                    alt=""
-                    className="w-6 h-6 rounded-full bg-violet-100"
-                    loading="lazy"
-                  />
-                  <img
-                    src="https://placekitten.com/52/52"
-                    alt=""
-                    className="w-6 h-6 rounded-full bg-violet-100"
-                    loading="lazy"
-                  />
-                </dd>
-              </div>
+                New Appointment
+              </button>
             </div>
           </div>
         </div>
-        {/* Modal */}
+
+        {/* Loading and Error States */}
+        {loading.appointments ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-violet-500"></div>
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center h-64 p-6 bg-red-50 rounded-xl">
+            <div className="flex items-center gap-3 mb-3">
+              <ExclamationTriangleIcon className="w-8 h-8 text-red-500" />
+              <h3 className="text-xl font-semibold text-red-600">
+                Loading Error
+              </h3>
+            </div>
+            <p className="text-red-500 text-center max-w-md">{error}</p>
+          </div>
+        ) : (
+          <>
+            {/* Appointments Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-6">
+              {currentAppointments.map((appointment, index) => (
+                <div
+                  key={index}
+                  className="bg-white p-5 rounded-xl shadow-sm border-2 border-gray-200 hover:border-violet-300 transition-colors"
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        {appointment.name}
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Age: {appointment.age}
+                      </p>
+                    </div>
+                    <span className="px-3 py-1 rounded-full bg-violet-100 text-violet-800 text-sm">
+                      {appointment.day}
+                    </span>
+                  </div>
+
+                  <div className="mb-4">
+                    <div className="flex items-center gap-3 bg-indigo-50 p-3 rounded-lg">
+                      <UserCircleIcon className="w-6 h-6 text-indigo-600" />
+                      <h4 className="text-lg font-semibold text-indigo-800">
+                        {appointment.doctor}
+                      </h4>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-700">
+                        Condition:
+                      </span>
+                      <span className="px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 text-sm">
+                        {appointment.illness}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-700">
+                        Time:
+                      </span>
+                      <span className="px-2.5 py-1 rounded-full bg-blue-100 text-blue-800 text-sm">
+                        {appointment.timeSlot.charAt(0).toUpperCase() +
+                          appointment.timeSlot.slice(1)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Pagination */}
+            <div className="px-6 py-4 border-t border-gray-200 bg-violet-50">
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <span className="text-sm text-violet-700">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 text-sm font-medium text-violet-700 bg-violet-100 rounded-lg hover:bg-violet-200 disabled:opacity-50 transition-colors"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={() =>
+                      setCurrentPage((p) => Math.min(totalPages, p + 1))
+                    }
+                    disabled={currentPage === totalPages}
+                    className="px-4 py-2 text-sm font-medium text-violet-700 bg-violet-100 rounded-lg hover:bg-violet-200 disabled:opacity-50 transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Appointment Modal */}
         <div
           id="myModal"
-          className="fixed inset-0 z-10 overflow-hidden backdrop-blur-lg hidden flex items-center justify-center transition-transform duration-300"
+          className="fixed inset-0 z-20 bg-black/30 backdrop-blur-sm hidden flex items-center justify-center"
         >
-          <div className="modal-container p-6 backdrop-blur-sm bg-white/90 w-11/12 sm:w-11/12 md:w-8/12 lg:w-6/12 rounded-md shadow-sm">
-            <h2 className="text-2xl font-semibold mb-6">Create New Project</h2>
-            <label
-              htmlFor="projectName"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Project Name
-            </label>
-            <input
-              type="text"
-              id="projectName"
-              className="w-full p-2 mb-4 rounded-lg focus:outline-none border-2 border-gray-100 focus:border-violet-300 transition-colors duration-300"
-            />
+          <div className="bg-white rounded-2xl shadow-xl w-11/12 md:w-96 p-6">
+            <h2 className="text-2xl font-bold mb-6 text-gray-800">
+              New Appointment
+            </h2>
+            <form onSubmit={handleBookAppointment} className="space-y-4">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Patient Name
+                  </label>
+                  <input
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    className="w-full p-2 rounded-lg border-2 border-gray-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-colors"
+                    required
+                  />
+                </div>
 
-            {/* Flex layout for lg and md screens */}
-            <div className="lg:flex">
-              <div className="lg:w-1/2 lg:pr-4">
-                <label
-                  htmlFor="projectDescription"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Description
-                </label>
-                <input
-                  id="projectDescription"
-                  className="w-full p-2 mb-4 rounded-lg focus:outline-none border-2 border-gray-100 focus:border-violet-300 transition-colors duration-300"
-                ></input>
-              </div>
-              <div className="lg:w-1/2">
-                <label
-                  htmlFor="inviteFriend"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Invite Friend
-                </label>
-                <input
-                  type="text"
-                  id="inviteFriend"
-                  className="w-full p-2 mb-4 rounded-lg focus:outline-none border-2 border-gray-100 focus:border-violet-300 transition-colors duration-300"
-                />
-              </div>
-            </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Age
+                    </label>
+                    <input
+                      name="age"
+                      type="number"
+                      value={formData.age}
+                      onChange={handleInputChange}
+                      className="w-full p-2 rounded-lg border-2 border-gray-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-colors"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Condition
+                    </label>
+                    <input
+                      name="illness"
+                      value={formData.illness}
+                      onChange={handleInputChange}
+                      className="w-full p-2 rounded-lg border-2 border-gray-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-colors"
+                      required
+                    />
+                  </div>
+                </div>
 
-            <div className="flex justify-end">
-              <button
-                className="bg-gradient-to-r from-violet-300 to-indigo-300 border border-fuchsia-00 hover:border-violet-100 text-white font-semibold py-2 px-4 rounded-md mr-2"
-                onClick={createProject}
-              >
-                Create
-              </button>
-              <button
-                className="bg-gradient-to-r from-gray-100 to-slate-200 border border-fuchsia-00 hover:border-violet-100 text-gray-800 font-semibold py-2 px-4 rounded-md transition-colors duration-300"
-                onClick={closeModal}
-              >
-                Cancel
-              </button>
-            </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Doctor
+                  </label>
+                  <select
+                    name="doctor"
+                    value={formData.doctor}
+                    onChange={handleInputChange}
+                    className="w-full p-2 rounded-lg border-2 border-gray-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-colors"
+                    required
+                  >
+                    <option value="">Select Doctor</option>
+                    {availableDoctors.length > 0 ? (
+                      availableDoctors.map((doctor, index) => (
+                        <option key={index} value={doctor.name}>
+                          {doctor.name} ({doctor.shift} Shift)
+                        </option>
+                      ))
+                    ) : (
+                      <option disabled>No doctors available this day</option>
+                    )}
+                  </select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Day
+                    </label>
+                    <select
+                      name="day"
+                      value={formData.day}
+                      onChange={handleInputChange}
+                      className="w-full p-2 rounded-lg border-2 border-gray-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-colors"
+                    >
+                      {[
+                        "Monday",
+                        "Tuesday",
+                        "Wednesday",
+                        "Thursday",
+                        "Friday",
+                        "Saturday",
+                        "Sunday",
+                      ].map((day) => (
+                        <option key={day} value={day}>
+                          {day}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Time Slot
+                    </label>
+                    <select
+                      name="timeSlot"
+                      value={formData.timeSlot}
+                      onChange={handleInputChange}
+                      className="w-full p-2 rounded-lg border-2 border-gray-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition-colors"
+                    >
+                      <option value="day">Day</option>
+                      <option value="night">Night</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 mt-6">
+                  <button
+                    type="button"
+                    className="col-span-1 py-2 px-4 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                    onClick={closeModal}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="col-span-1 py-2 px-4 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
+                  >
+                    Book Now
+                  </button>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
       </div>

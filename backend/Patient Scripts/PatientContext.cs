@@ -1,11 +1,13 @@
 using ClosedXML.Excel;
 using backend.excel;
-
 public class Patient : ExcelBase
 {
     public string Name { get; set; } = string.Empty;
     public string Age { get; set; } = string.Empty;
     public string Illness { get; set; } = string.Empty;
+    public string Doctor { get; set; } = string.Empty;
+    public string TimeSlot { get; set; } = string.Empty;
+    public string Day { get; set; } = string.Empty;
 
     public Patient() { }
 
@@ -16,14 +18,14 @@ public class Patient : ExcelBase
         return fullPath;
     }
 
-
-    public static List<Patient> SearchPatient(string searchName)
+    public static List<Patient> GetAllPatients()
     {
-        List<Patient> foundPatients = new List<Patient>();
+        List<Patient> patients = new List<Patient>();
 
         Patient instance = new Patient();
         string filepath = instance.GetFilePath();
 
+        // Check if the file exists
         if (!File.Exists(filepath))
         {
             throw new FileNotFoundException("Error: Patient database not found.");
@@ -34,33 +36,38 @@ public class Patient : ExcelBase
             var worksheet = workbook.Worksheet(1);
             var range = worksheet.RangeUsed();
 
+            // Check if the worksheet is empty
             if (range == null)
             {
                 throw new Exception("Error: Worksheet is empty.");
             }
 
-            int nameColumnIndex = 1;  
-            int illnessColumnIndex = 3;
-            int ageColumnIndex = 2;   
+            // Define column indices (assuming the first row contains headers)
+            int nameColumnIndex = 1;  // Column A
+            int ageColumnIndex = 2;   // Column B
+            int illnessColumnIndex = 3; // Column C
+            int doctorColumnIndex = 4; // Column D
+            int timeSlotColumnIndex = 5; // Column E
+            int dayColumnIndex = 6; // Column F
 
+            // Iterate through all used rows (skip the header row)
             foreach (var row in range.RowsUsed().Skip(1))
             {
-                var name = row.Cell(nameColumnIndex).GetString().Trim();
-                if (!string.IsNullOrEmpty(name) && name.Contains(searchName, StringComparison.OrdinalIgnoreCase))
+                // Create a new Patient object for each row
+                Patient patient = new Patient
                 {
-                    // Create and store the matched Patient record
-                    Patient patient = new Patient
-                    {
-                        Name = name,
-                        Age = row.Cell(ageColumnIndex).GetString().Trim(),
-                        Illness = row.Cell(illnessColumnIndex).GetString().Trim()
-                    };
+                    Name = row.Cell(nameColumnIndex).GetString().Trim(),
+                    Age = row.Cell(ageColumnIndex).GetString().Trim(),
+                    Illness = row.Cell(illnessColumnIndex).GetString().Trim(),
+                    Doctor = row.Cell(doctorColumnIndex).GetString().Trim(),
+                    TimeSlot = row.Cell(timeSlotColumnIndex).GetString().Trim(),
+                    Day = row.Cell(dayColumnIndex).GetString().Trim()
+                };
 
-                    foundPatients.Add(patient);
-                }
+                patients.Add(patient);
             }
         }
 
-        return foundPatients;
+        return patients;
     }
 }
