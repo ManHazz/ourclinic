@@ -62,62 +62,62 @@ let popularLawyer = [
     subTitle: "UI /UX Designer",
     exp: "Information Technology",
     reviews: "123",
-    img_lawyer: "/lawyer_one.png",
+    img_lawyer: "/Atiff.jpg",
   },
   {
     mainTitle: "AIMAN HAZIMIN",
     subTitle: "Team Leader",
     exp: "Computer Engineering",
     reviews: "123",
-    img_lawyer: "/lawyer_two.png",
+    img_lawyer: "/Aiman.jpg",
   },
   {
     mainTitle: "ARIQ DANISH",
     subTitle: "Backend Developer",
     exp: "Computer Engineering",
     reviews: "123",
-    img_lawyer: "/lawyer_three.png",
+    img_lawyer: "/riq.jpg",
   },
   {
     mainTitle: "AQIL ARMAN",
     subTitle: "UI /UX Developer",
     exp: "Information Technology",
     reviews: "123",
-    img_lawyer: "/lawyer_one.png",
+    img_lawyer: "/Aqiel.jpg",
   },
   {
     mainTitle: "AHMAD AZRI",
     subTitle: "Backend Developer",
     exp: "Computer Engineering",
     reviews: "123",
-    img_lawyer: "/lawyer_one.png",
+    img_lawyer: "/b.jpg",
   },
 ];
 
 let customer = [
   {
-    cus_img: "/customer_one.svg",
+    cus_img: "/Ron.jpg",
     cus_mainTitle: "Airil Ron",
     cus_subTitle: "CEO, Financial corp.",
     cus_content:
       "The staff of the entire facility that I had contact with were very attentive, caring and efficient",
   },
   {
-    cus_img: "/customer_three.svg",
+    cus_img: "/Aimann.jpeg",
     cus_mainTitle: "Aiman Haziq",
     cus_subTitle: "CEO, Financial corp.",
     cus_content:
       "I am so glad I chose this clinic! From the quick check-in to the thorough examination, everything was perfect. The doctor was very knowledgeable and patient, making me feel completely comfortable.",
   },
   {
-    cus_img: "/customer_two.svg",
+    cus_img: "/aadam.jpg",
     cus_mainTitle: "Adam Mustaqim",
     cus_subTitle: "CEO, Financial corp.",
     cus_content:
       "From registration to medical assistant to physician, everyone was kind and helpful and everything went smoothly and quickly. So appreciate having OurClinic close by for times when needed. Will not hesitate to visit again if need be",
   },
   {
-    cus_img: "/customer_three.svg",
+    cus_img: "/Haizad.jpg",
     cus_mainTitle: "Haizad Ashraf",
     cus_subTitle: "CEO, Financial corp.",
     cus_content:
